@@ -221,16 +221,7 @@ function rebuildTrayMenu() {
 
   tray.setContextMenu(menu);
   tray.setToolTip(APP_NAME);
-
-  if (state.isOnBreak) {
-    tray.setTitle('CatClock BREAK');
-  } else if (state.isRunning) {
-    tray.setTitle('CatClock ON');
-  } else if (!state.enabled) {
-    tray.setTitle('CatClock OFF');
-  } else {
-    tray.setTitle('CatClock PAUSE');
-  }
+  tray.setTitle('Cat');
 }
 
 function createTray() {
