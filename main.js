@@ -150,6 +150,7 @@ function closeBreakWindow() {
 
 function finishBreak() {
   state.isOnBreak = false;
+  state.isRunning = state.enabled;
   state.breakEndAt = null;
   resetNextBreak();
   closeBreakWindow();
@@ -158,6 +159,7 @@ function finishBreak() {
 
 function skipToNextCycle() {
   state.isOnBreak = false;
+  state.isRunning = state.enabled;
   state.breakEndAt = null;
   resetNextBreak();
   closeBreakWindow();
