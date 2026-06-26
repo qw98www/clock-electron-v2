@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Break Time</title>
+    <link rel="stylesheet" href="./break.css" />
+  </head>
+  <body>
+    <main class="break-wrap">
+      <div id="mediaContainer" class="media-container">
+        <video id="introVideo" autoplay muted playsinline preload="auto" class="break-video"></video>
+        <video id="loopVideo" muted playsinline preload="auto" class="break-video" style="display:none"></video>
+        <div id="fallback" class="fallback-content" style="display:none">
+          <div class="cat">=^.^=</div>
+        </div>
+      </div>
+      <h1>Break Time</h1>
+      <p>Look away from screen, relax your eyes and neck.</p>
+      <p class="timer" id="timer">--:--</p>
+      <button id="endNowBtn">End Break Now</button>
+    </main>
+    <script src="./break.js"></script>
+  </body>
+</html>

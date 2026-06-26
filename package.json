@@ -1,0 +1,37 @@
+{
+  "name": "cat-clock-electron-v2",
+  "version": "1.0.0",
+  "description": "Cat Clock desktop break reminder built with Electron.",
+  "main": "main.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac",
+    "pack": "electron-builder --dir --mac"
+  },
+  "devDependencies": {
+    "electron": "^42.4.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.qw98www.catclock",
+    "productName": "Cat Clock",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
+  }
+}

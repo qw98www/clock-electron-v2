@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat Clock</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>Cat Clock</h1>
+      <p class="subtitle">Ultra-simple desktop break reminder</p>
+
+      <label>
+        <span>Enable reminders</span>
+        <input id="enabled" type="checkbox" checked />
+      </label>
+
+      <label>
+        <span>Work interval (minutes)</span>
+        <input id="intervalMinutes" type="number" min="1" max="240" value="45" />
+      </label>
+
+      <label>
+        <span>Break duration (minutes)</span>
+        <input id="breakMinutes" type="number" min="1" max="60" value="5" />
+      </label>
+
+      <label>
+        <span>Launch at login</span>
+        <input id="launchAtLogin" type="checkbox" />
+      </label>
+
+      <div class="actions">
+        <button id="saveBtn">Save</button>
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="skipBtn">Skip</button>
+      </div>
+
+      <section class="status">
+        <h2>Status</h2>
+        <p id="statusText">Loading...</p>
+        <p id="nextBreakText"></p>
+      </section>
+
+      <p class="footnote">Close the window to keep Cat Clock running in the tray.</p>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
