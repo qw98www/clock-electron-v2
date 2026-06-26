@@ -251,7 +251,7 @@ function showBreakWindow() {
 
   breakWindow = new BrowserWindow({
     width: 900,
-    height: 620,
+    height: 820,
     alwaysOnTop: true,
     fullscreenable: true,
     autoHideMenuBar: true,
