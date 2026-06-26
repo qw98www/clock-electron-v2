@@ -1,10 +1,23 @@
 const enabledInput = document.getElementById('enabled');
-const intervalInput = document.getElementById('intervalMinutes');
-const breakInput = document.getElementById('breakMinutes');
+const intervalValueInput = document.getElementById('intervalValue');
+const intervalUnitSelect = document.getElementById('intervalUnit');
+const breakValueInput = document.getElementById('breakValue');
+const breakUnitSelect = document.getElementById('breakUnit');
 const launchAtLoginInput = document.getElementById('launchAtLogin');
 const statusText = document.getElementById('statusText');
 const nextBreakText = document.getElementById('nextBreakText');
 const api = window.desktopApi;
+
+// Convert seconds to the display value given the chosen unit
+function secsToDisplay(secs, unit) {
+  return unit === 'min' ? Math.round(secs / 60) : secs;
+}
+
+// Convert display value + unit back to seconds
+function displayToSecs(val, unit) {
+  const n = Number.parseInt(val, 10);
+  return unit === 'min' ? n * 60 : n;
+}
 
 if (!api) {
   statusText.textContent = 'Bridge unavailable';
@@ -25,8 +38,9 @@ function formatMsAsClock(ms) {
 
 function render(state) {
   enabledInput.checked = !!state.enabled;
-  intervalInput.value = String(state.intervalMinutes);
-  breakInput.value = String(state.breakMinutes);
+  // Only update the numeric value, preserve the user's chosen unit
+  intervalValueInput.value = secsToDisplay(state.intervalSecs, intervalUnitSelect.value);
+  breakValueInput.value = secsToDisplay(state.breakSecs, breakUnitSelect.value);
   launchAtLoginInput.checked = !!state.launchAtLogin;
 
   if (!state.enabled) {
@@ -56,11 +70,22 @@ async function refresh() {
   render(state);
 }
 
+// When user switches unit, convert the displayed value to keep the same duration
+intervalUnitSelect.addEventListener('change', () => {
+  const currentSecs = displayToSecs(intervalValueInput.value, intervalUnitSelect.value === 'min' ? 'sec' : 'min');
+  intervalValueInput.value = secsToDisplay(currentSecs, intervalUnitSelect.value);
+});
+
+breakUnitSelect.addEventListener('change', () => {
+  const currentSecs = displayToSecs(breakValueInput.value, breakUnitSelect.value === 'min' ? 'sec' : 'min');
+  breakValueInput.value = secsToDisplay(currentSecs, breakUnitSelect.value);
+});
+
 document.getElementById('saveBtn').addEventListener('click', async () => {
   await api.saveSettings({
     enabled: enabledInput.checked,
-    intervalMinutes: Number.parseInt(intervalInput.value, 10),
-    breakMinutes: Number.parseInt(breakInput.value, 10),
+    intervalSecs: displayToSecs(intervalValueInput.value, intervalUnitSelect.value),
+    breakSecs: displayToSecs(breakValueInput.value, breakUnitSelect.value),
     launchAtLogin: launchAtLoginInput.checked,
   });
   await refresh();

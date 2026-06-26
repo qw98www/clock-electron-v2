@@ -45,6 +45,25 @@ input[type='number'] {
   font-size: 15px;
 }
 
+.input-unit-row {
+  display: flex;
+  gap: 6px;
+}
+
+.input-unit-row input[type='number'] {
+  flex: 1;
+  min-width: 0;
+}
+
+.input-unit-row select {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+}
+
 .actions {
   margin-top: 16px;
   display: grid;

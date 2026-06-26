@@ -15,8 +15,8 @@ let isQuitting = false;
 
 const DEFAULT_SETTINGS = {
   enabled: true,
-  intervalMinutes: 45,
-  breakMinutes: 5,
+  intervalSecs: 45 * 60,
+  breakSecs: 5 * 60,
 };
 
 const state = {
@@ -44,8 +44,17 @@ function loadSettings() {
     const raw = fs.readFileSync(settingsPath(), 'utf8');
     const parsed = JSON.parse(raw);
     state.enabled = parsed.enabled !== false;
-    state.intervalMinutes = clampNumber(parsed.intervalMinutes, 1, 240, DEFAULT_SETTINGS.intervalMinutes);
-    state.breakMinutes = clampNumber(parsed.breakMinutes, 1, 60, DEFAULT_SETTINGS.breakMinutes);
+    // Support both new (intervalSecs) and legacy (intervalMinutes) format
+    if (parsed.intervalSecs !== undefined) {
+      state.intervalSecs = clampNumber(parsed.intervalSecs, 10, 240 * 60, DEFAULT_SETTINGS.intervalSecs);
+    } else if (parsed.intervalMinutes !== undefined) {
+      state.intervalSecs = clampNumber(parsed.intervalMinutes, 1, 240, 45) * 60;
+    }
+    if (parsed.breakSecs !== undefined) {
+      state.breakSecs = clampNumber(parsed.breakSecs, 5, 60 * 60, DEFAULT_SETTINGS.breakSecs);
+    } else if (parsed.breakMinutes !== undefined) {
+      state.breakSecs = clampNumber(parsed.breakMinutes, 1, 60, 5) * 60;
+    }
     state.launchAtLogin = parsed.launchAtLogin === true;
   } catch (_error) {
     saveSettings();
@@ -55,8 +64,8 @@ function loadSettings() {
 function saveSettings() {
   const payload = {
     enabled: state.enabled,
-    intervalMinutes: state.intervalMinutes,
-    breakMinutes: state.breakMinutes,
+    intervalSecs: state.intervalSecs,
+    breakSecs: state.breakSecs,
     launchAtLogin: state.launchAtLogin,
   };
   fs.writeFileSync(settingsPath(), JSON.stringify(payload, null, 2), 'utf8');
@@ -65,8 +74,8 @@ function saveSettings() {
 function publicState() {
   return {
     enabled: state.enabled,
-    intervalMinutes: state.intervalMinutes,
-    breakMinutes: state.breakMinutes,
+    intervalSecs: state.intervalSecs,
+    breakSecs: state.breakSecs,
     launchAtLogin: state.launchAtLogin,
     isRunning: state.isRunning,
     isOnBreak: state.isOnBreak,
@@ -108,7 +117,7 @@ function showMainWindow() {
 }
 
 function resetNextBreak() {
-  state.nextBreakAt = Date.now() + state.intervalMinutes * 60 * 1000;
+  state.nextBreakAt = Date.now() + state.intervalSecs * 1000;
   state.pausedRemainingMs = null;
 }
 
@@ -235,7 +244,7 @@ function showBreakWindow() {
   state.isOnBreak = true;
   state.isRunning = false;
   state.pausedRemainingMs = null;
-  state.breakEndAt = Date.now() + state.breakMinutes * 60 * 1000;
+  state.breakEndAt = Date.now() + state.breakSecs * 1000;
   state.nextBreakAt = null;
 
   closeBreakWindow();
@@ -371,8 +380,8 @@ ipcMain.handle('state:get', () => publicState());
 
 ipcMain.handle('settings:save', (_event, nextSettings) => {
   state.enabled = nextSettings.enabled !== false;
-  state.intervalMinutes = clampNumber(nextSettings.intervalMinutes, 1, 240, DEFAULT_SETTINGS.intervalMinutes);
-  state.breakMinutes = clampNumber(nextSettings.breakMinutes, 1, 60, DEFAULT_SETTINGS.breakMinutes);
+  state.intervalSecs = clampNumber(nextSettings.intervalSecs, 10, 240 * 60, DEFAULT_SETTINGS.intervalSecs);
+  state.breakSecs = clampNumber(nextSettings.breakSecs, 5, 60 * 60, DEFAULT_SETTINGS.breakSecs);
   if (typeof nextSettings.launchAtLogin === 'boolean') {
     setLaunchAtLogin(nextSettings.launchAtLogin);
   }
@@ -385,9 +394,9 @@ ipcMain.handle('settings:save', (_event, nextSettings) => {
     state.breakEndAt = null;
     state.pausedRemainingMs = null;
     closeBreakWindow();
-  } else if (!state.isOnBreak && state.isRunning) {
-    resetNextBreak();
   }
+  // When timer is running, keep the current countdown unchanged.
+  // New interval takes effect from the next cycle (after break or skip).
 
   sendState();
   return publicState();
