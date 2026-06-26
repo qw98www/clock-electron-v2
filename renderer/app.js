@@ -35,9 +35,9 @@ function render(state) {
     return;
   }
 
-  if (state.isOnBreak && state.breakEndAt) {
+  if (state.isOnBreak) {
     statusText.textContent = 'On Break';
-    nextBreakText.textContent = `Break remaining: ${formatMsAsClock(state.breakEndAt - state.now)}`;
+    nextBreakText.textContent = '';
     return;
   }
 
