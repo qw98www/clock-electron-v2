@@ -18,23 +18,29 @@
 
       <label>
         <span>Work interval</span>
-        <div class="input-unit-row">
-          <input id="intervalValue" type="number" min="1" value="45" />
-          <select id="intervalUnit">
-            <option value="min">min</option>
-            <option value="sec">sec</option>
-          </select>
+        <div class="duration-row">
+          <div class="duration-field">
+            <input id="intervalMinutes" type="number" min="0" max="240" value="45" />
+            <span>min</span>
+          </div>
+          <div class="duration-field">
+            <input id="intervalSeconds" type="number" min="0" max="59" value="0" />
+            <span>sec</span>
+          </div>
         </div>
       </label>
 
       <label>
         <span>Break duration</span>
-        <div class="input-unit-row">
-          <input id="breakValue" type="number" min="1" value="5" />
-          <select id="breakUnit">
-            <option value="min">min</option>
-            <option value="sec">sec</option>
-          </select>
+        <div class="duration-row">
+          <div class="duration-field">
+            <input id="breakMinutes" type="number" min="0" max="60" value="5" />
+            <span>min</span>
+          </div>
+          <div class="duration-field">
+            <input id="breakSeconds" type="number" min="0" max="59" value="0" />
+            <span>sec</span>
+          </div>
         </div>
       </label>
 

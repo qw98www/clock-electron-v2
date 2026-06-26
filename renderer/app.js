@@ -1,22 +1,27 @@
 const enabledInput = document.getElementById('enabled');
-const intervalValueInput = document.getElementById('intervalValue');
-const intervalUnitSelect = document.getElementById('intervalUnit');
-const breakValueInput = document.getElementById('breakValue');
-const breakUnitSelect = document.getElementById('breakUnit');
+const intervalMinutesInput = document.getElementById('intervalMinutes');
+const intervalSecondsInput = document.getElementById('intervalSeconds');
+const breakMinutesInput = document.getElementById('breakMinutes');
+const breakSecondsInput = document.getElementById('breakSeconds');
 const launchAtLoginInput = document.getElementById('launchAtLogin');
 const statusText = document.getElementById('statusText');
 const nextBreakText = document.getElementById('nextBreakText');
 const api = window.desktopApi;
 
-// Convert seconds to the display value given the chosen unit
-function secsToDisplay(secs, unit) {
-  return unit === 'min' ? Math.round(secs / 60) : secs;
+function splitSecs(secs) {
+  const safeSecs = Number.isFinite(secs) && secs > 0 ? secs : 0;
+  return {
+    minutes: Math.floor(safeSecs / 60),
+    seconds: safeSecs % 60,
+  };
 }
 
-// Convert display value + unit back to seconds
-function displayToSecs(val, unit) {
-  const n = Number.parseInt(val, 10);
-  return unit === 'min' ? n * 60 : n;
+function readDurationSecs(minutesInput, secondsInput) {
+  const minutes = Number.parseInt(minutesInput.value, 10);
+  const seconds = Number.parseInt(secondsInput.value, 10);
+  const safeMinutes = Number.isFinite(minutes) && minutes > 0 ? minutes : 0;
+  const safeSeconds = Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds, 59) : 0;
+  return safeMinutes * 60 + safeSeconds;
 }
 
 if (!api) {
@@ -38,9 +43,12 @@ function formatMsAsClock(ms) {
 
 function render(state) {
   enabledInput.checked = !!state.enabled;
-  // Only update the numeric value, preserve the user's chosen unit
-  intervalValueInput.value = secsToDisplay(state.intervalSecs, intervalUnitSelect.value);
-  breakValueInput.value = secsToDisplay(state.breakSecs, breakUnitSelect.value);
+  const intervalParts = splitSecs(state.intervalSecs);
+  const breakParts = splitSecs(state.breakSecs);
+  intervalMinutesInput.value = String(intervalParts.minutes);
+  intervalSecondsInput.value = String(intervalParts.seconds);
+  breakMinutesInput.value = String(breakParts.minutes);
+  breakSecondsInput.value = String(breakParts.seconds);
   launchAtLoginInput.checked = !!state.launchAtLogin;
 
   if (!state.enabled) {
@@ -70,22 +78,11 @@ async function refresh() {
   render(state);
 }
 
-// When user switches unit, convert the displayed value to keep the same duration
-intervalUnitSelect.addEventListener('change', () => {
-  const currentSecs = displayToSecs(intervalValueInput.value, intervalUnitSelect.value === 'min' ? 'sec' : 'min');
-  intervalValueInput.value = secsToDisplay(currentSecs, intervalUnitSelect.value);
-});
-
-breakUnitSelect.addEventListener('change', () => {
-  const currentSecs = displayToSecs(breakValueInput.value, breakUnitSelect.value === 'min' ? 'sec' : 'min');
-  breakValueInput.value = secsToDisplay(currentSecs, breakUnitSelect.value);
-});
-
 document.getElementById('saveBtn').addEventListener('click', async () => {
   await api.saveSettings({
     enabled: enabledInput.checked,
-    intervalSecs: displayToSecs(intervalValueInput.value, intervalUnitSelect.value),
-    breakSecs: displayToSecs(breakValueInput.value, breakUnitSelect.value),
+    intervalSecs: readDurationSecs(intervalMinutesInput, intervalSecondsInput),
+    breakSecs: readDurationSecs(breakMinutesInput, breakSecondsInput),
     launchAtLogin: launchAtLoginInput.checked,
   });
   await refresh();
